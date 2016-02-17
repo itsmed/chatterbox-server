@@ -20,18 +20,17 @@ var requestHandler = function(request, response) {
   headers['Content-Type'] = 'application/json';
   request.headers = headers;
   response.headers = headers;
-  var responseBody = { // need to write to response body
-
-    // array of objects w username and message
-    results: []
-  }; 
+  var responseBody = {}; 
 
   if ( request.method === 'GET' ) {
     if (request.url === '/classes/messages') {
+      
+      //user is asking for all the messages to be returned
+
       console.log('handling GET request to /classes/messages');
 
       //send back messageStorage
-      
+      responseBody.results = messageStorage;
 
       response.statusCode = 200;
             
@@ -55,6 +54,9 @@ var requestHandler = function(request, response) {
       console.log('POST request received, URL is', request.url);
 
       if(request.url === '/classes/messages'){
+
+        //user wants to store a message
+        
         console.log('handling POST request to /classes/messages');
 
         //POST comes with data, so get it
