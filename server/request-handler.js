@@ -15,31 +15,85 @@ this file and include it in basic-server.js so that it actually works.
 
 var requestHandler = function(request, response) {
 
-  var statusCode = 200;
   var headers = defaultCorsHeaders;
-  request.body = []; // make request body
+  var messageStorage = []; // message storage
   headers['Content-Type'] = 'application/json';
   request.headers = headers;
   response.headers = headers;
-
-  if ( request.method === 'GET' ) {
-
-  }
-  else if (request.method === 'POST') {
-      statusCode = 201;
-  }
-  else { // file not found
-    statusCode = 404;
-  }
-
   var responseBody = { // need to write to response body
 
+    // array of objects w username and message
     results: []
-    // headers: response.headers,
-    // method: 'GET',
-    // url: url,
   }; 
-  response.writeHead(statusCode);
+
+  if ( request.method === 'GET' ) {
+    if (request.url === '/classes/messages') {
+      console.log('handling GET request to /classes/messages');
+
+      //send back messageStorage
+      
+
+      response.statusCode = 200;
+            
+      // request.on('data', function(chunk) {
+      //   response.write(chunk);
+      // });
+
+    } else if(request.url === '/log'){
+      console.log('handling GET request to /log');
+      response.statusCode = 200;
+    } else {
+      console.log('handling GET request to other URL');
+      response.statusCode = 404;
+    }
+  }
+  else if (request.method === 'POST') {
+      var temp;
+      response.statusCode = 201;
+      var allData = '';
+      
+      console.log('POST request received, URL is', request.url);
+
+      if(request.url === '/classes/messages'){
+        console.log('handling POST request to /classes/messages');
+
+        //POST comes with data, so get it
+        request.on('data', function(chunk) {
+          allData += chunk.toString();
+          console.log('----------------------------------------chunk: ');
+        });
+
+
+        request.on('end', function() {
+          
+          console.log('data ended!!!', allData);
+
+          //turn allData back into an object and store it!
+          messageStorage.push(JSON.parse(allData));
+
+
+          //body = Buffer.concat(body).toString();
+
+          //do something with the data (store it)
+
+        });
+
+      }else if(request.url === '/send'){
+        console.log('handling POST request to /send');
+        
+      }
+
+
+      // console.log('*****************************body: ', body);
+  }
+  else { // file not found
+    response.statusCode = 404;
+  }
+
+  //responseBody['results'].push(body);
+  console.log('----------------------------------------responseBody: ', responseBody);
+
+  response.writeHead(response.statusCode, headers);
   response.write(JSON.stringify(responseBody));
   response.end();
 };
